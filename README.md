@@ -32,3 +32,7 @@ and reasoning evaluation
 • Structured feedback report including technical and communication scores 
 • Interview session history and performance analytics dashboard 
 • Browser locking mechanism during interviews to prevent tab switching and cheating 
+
+TECH STACK:
+HTML
+Tailwind CSS
