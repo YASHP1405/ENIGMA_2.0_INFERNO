@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cognitive Test - MockMentor AI</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap");
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: #0f172a;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen relative flex flex-col items-center justify-center p-4">
+    <canvas id="neuralCanvas" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
+
+    <!-- Anti-Cheat Violation Box -->
+    <div id="violationWarnings" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 md:p-10 relative overflow-hidden">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div
+                class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-cyan-500/20 text-cyan-400 mb-4 border border-cyan-500/30">
+                <i data-lucide="brain" class="w-8 h-8"></i>
+            </div>
+            <h1 class="text-3xl font-extrabold mb-2">Stage 1: Cognitive Reasoning</h1>
+            <p class="text-gray-400">Answer these 10 rapid-fire questions to test your logical aptitude.</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-800 rounded-full h-2 mb-8 border border-white/5 overflow-hidden">
+            <div id="progressBar"
+                class="bg-gradient-to-r from-cyan-400 to-indigo-500 h-2 rounded-full transition-all duration-300"
+                style="width: 0%"></div>
+        </div>
+
+        <!-- Questions Container -->
+        <form id="quizForm" class="space-y-6">
+            <!-- Injected via JS -->
+        </form>
+
+        <!-- Submit Button -->
+        <div class="mt-10 flex justify-end hidden" id="submitBtnContainer">
+            <button type="button" onclick="submitCognitiveTest()"
+                class="bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-3 rounded-xl font-bold transition shadow-lg shadow-cyan-500/20 flex items-center gap-2">
+                Submit & Continue to Coding <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+
+        // Background Canvas
+        const canvas = document.getElementById("neuralCanvas");
+        const ctx = canvas.getContext("2d");
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.age = 0;
+                this.life = 200 + Math.random() * 100;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy; this.age++;
+                if (this.age > this.life || this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(6, 182, 212, ${0.3 * (1 - this.age / this.life)})`;
+                ctx.fillRect(this.x, this.y, 2, 2);
+            }
+        }
+        const particles = Array(80).fill().map(() => new Particle());
+        function loop() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(loop);
+        }
+        loop();
+
+        // The Questions From Enigmacrash
+        const COGNITIVE_POOL = [
+            { question: "What comes next? 2, 6, 12, 20, ?", options: ["28", "30", "26", "32"], answer: "30" },
+            { question: "If A=1, B=2, C=3, what is CAT?", options: ["24", "20", "15", "10"], answer: "24" },
+            { question: "Find odd one: Apple, Mango, Carrot, Banana", options: ["Apple", "Carrot", "Banana", "Mango"], answer: "Carrot" },
+            { question: "Clock angle at 3:15?", options: ["0°", "7.5°", "15°", "30°"], answer: "7.5°" },
+            { question: "2x = 10, x=?", options: ["5", "10", "2", "20"], answer: "5" },
+            { question: "Shape with 8 sides?", options: ["Hexagon", "Octagon", "Pentagon", "Heptagon"], answer: "Octagon" },
+            { question: "15% of 200?", options: ["25", "30", "35", "40"], answer: "30" },
+            { question: "3, 9, 27, ?", options: ["54", "81", "72", "63"], answer: "81" },
+            { question: "ALL BLOOPS are RAZZIES. Are BLOOPS LUPPIES?", options: ["Yes", "No", "Cannot Determine", "Sometimes"], answer: "Yes" },
+            { question: "12 × 12?", options: ["124", "144", "132", "154"], answer: "144" }
+        ];
+
+        // Randomize and pick 10
+        const questions = COGNITIVE_POOL.sort(() => 0.5 - Math.random()).slice(0, 10);
+        const quizForm = document.getElementById('quizForm');
+
+        function renderQuestions() {
+            quizForm.innerHTML = questions.map((q, idx) => `
+        <div class="bg-slate-800/50 border border-white/5 rounded-2xl p-6 hover:bg-slate-800 transition shadow-sm card-question" data-idx="${idx}">
+          <p class="font-semibold text-lg mb-4 text-cyan-50">
+            <span class="text-cyan-400 mr-2">Q${idx + 1}:</span> ${q.question}
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            ${q.options.map(opt => `
+              <label class="flex items-center gap-3 p-3 rounded-lg border border-white/10 cursor-pointer hover:border-cyan-500/50 hover:bg-cyan-500/5 transition">
+                <input type="radio" name="q${idx}" value="${opt}" class="w-4 h-4 text-cyan-500 bg-slate-700 border-white/20 focus:ring-cyan-500 focus:ring-offset-slate-900" onchange="updateProgress()">
+                <span class="text-sm text-gray-300">${opt}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+        }
+
+        function updateProgress() {
+            const total = questions.length;
+            const answered = document.querySelectorAll('.card-question input[type="radio"]:checked').length;
+            const percent = (answered / total) * 100;
+            document.getElementById('progressBar').style.width = percent + '%';
+
+            if (answered === total) {
+                document.getElementById('submitBtnContainer').classList.remove('hidden');
+            }
+        }
+
+        renderQuestions();
+
+        // --- INTEGRITY SUITE (ANTI-CHEAT) ---
+        let violationCount = 0;
+        const maxViolations = 3;
+
+        function registerViolation(reason) {
+            violationCount++;
+
+            const box = document.createElement("div");
+            box.className = "bg-red-500/90 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-fade-in";
+            box.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4"></i> Violation: ${reason} (${violationCount}/${maxViolations})`;
+            document.getElementById("violationWarnings").appendChild(box);
+            if (window.lucide) window.lucide.createIcons();
+
+            setTimeout(() => box.remove(), 4000);
+
+            if (violationCount >= maxViolations) {
+                alert("🚨 Integrity Failure: Too many violations. Auto-submitting test.");
+                submitCognitiveTest();
+            }
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) registerViolation("Tab Switched or Minimized");
+        });
+        window.addEventListener("blur", () => registerViolation("Window Focus Lost"));
+        document.addEventListener("contextmenu", e => { e.preventDefault(); registerViolation("Right Click Disabled"); });
+        document.addEventListener("copy", e => { e.preventDefault(); registerViolation("Copying Blocked"); });
+        document.addEventListener("paste", e => { e.preventDefault(); registerViolation("Pasting Blocked"); });
+        document.addEventListener("keydown", e => {
+            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") || (e.ctrlKey && e.key === "c") || (e.ctrlKey && e.key === "v")) {
+                e.preventDefault();
+                registerViolation("Developer Shortcut Attempt");
+            }
+        });
+
+        // --- SUBMIT LOGIC ---
+        function submitCognitiveTest() {
+            let score = 0;
+            for (let i = 0; i < questions.length; i++) {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if (selected && selected.value === questions[i].answer) {
+                    score++;
+                }
+            }
+
+            const cognitivePercent = (score / questions.length) * 100;
+
+            // Save state and move to coding test
+            localStorage.setItem("cognitive_percent", cognitivePercent);
+            localStorage.setItem("cognitive_violations", violationCount);
+
+            window.location.href = "coding_test.html";
+        }
+    </script>
+</body>
+
+</html>
