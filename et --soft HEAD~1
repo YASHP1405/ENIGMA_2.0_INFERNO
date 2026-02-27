@@ -1,0 +1,6 @@
+[35mcoding_test.html[m[36m:[m        const GROQ_API_KEY = "[1;31mgsk_[mptdnlWSLkeOxytqfdqenWGdyb3FYCWUM4zkeAhlOMkiTLDxWGkre";
+[35minterview.html[m[36m:[m    const GROQ_API_KEY = "[1;31mgsk_[mptdnlWSLkeOxytqfdqenWGdyb3FYCWUM4zkeAhlOMkiTLDxWGkre";
+[35minterview.html[m[36m:[m      const GROQ_API_KEY = storedKey || prompt("Enter your Groq API Key ([1;31mgsk_[m...) to connect to the AI:");
+[35mreport.html[m[36m:[m              "Authorization": "Bearer [1;31mgsk_[mptdnlWSLkeOxytqfdqenWGdyb3FYCWUM4zkeAhlOMkiTLDxWGkre",
+[35mresume_interview.html[m[36m:[m          "Authorization": "Bearer [1;31mgsk_[mptdnlWSLkeOxytqfdqenWGdyb3FYCWUM4zkeAhlOMkiTLDxWGkre"
+[35mresume_interview.html[m[36m:[m          "Authorization": "Bearer [1;31mgsk_[mptdnlWSLkeOxytqfdqenWGdyb3FYCWUM4zkeAhlOMkiTLDxWGkre"
